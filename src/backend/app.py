@@ -9,4 +9,3 @@ try:
     print(f"Temp: {temperature_c} C  Humidity: {humidity}%")
 except RuntimeError as e:
     print(f"Error reading from DHT11: {e}")
-    
