@@ -44,7 +44,7 @@ input[type="radio"] {
 } 
 
 input[type="radio"]:checked + label {
-    color: rgb(126, 199, 255);
+    color: rgb(110, 180, 233);
 }
 
 #data-container {

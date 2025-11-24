@@ -11,7 +11,7 @@ def temperature_c() -> Generator[str]:
     while True:
         try:
             # temp = _dht.temperature
-            temp = 25.0  # Placeholder for actual sensor reading
+            temp = 15.0  # Placeholder for actual sensor reading
             if temp is not None:
                 yield f"data: {temp}\n\n"
         except RuntimeError:
