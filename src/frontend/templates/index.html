@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>DHT11 Dashboard</title>
+        <link
+            rel="stylesheet"
+            href="{{ url_for('static', filename='style.css') }}"
+        />
+    </head>
+    <body>
+        <header>
+            <div id="title-container" class="header-item">
+                <h1 id="title">DHT11 Dashboard</h1>
+            </div>
+            <div id="unit-converter-container" class="header-item">
+                <input
+                    type="radio"
+                    id="celsius"
+                    name="unit"
+                    value="celsius"
+                    checked
+                    onclick="setTemperature()"
+                />
+                <label for="celsius">°C</label>
+                <p style="margin: 0 5px">|</p>
+                <input
+                    type="radio"
+                    id="fahrenheit"
+                    name="unit"
+                    value="fahrenheit"
+                    onclick="setTemperature()"
+                />
+                <label for="fahrenheit">°F</label>
+            </div>
+        </header>
+
+        <main>
+            <div id="data-container">
+                <div class="data-box">
+                    <h2>Temperature</h2>
+                    <p id="temperature">-- °C</p>
+                </div>
+                <div class="data-box">
+                    <h2>Humidity</h2>
+                    <p id="humidity">-- %</p>
+                </div>
+            </div>
+        </main>
+    </body>
+    <script>
+        const tempStream = new EventSource("/streams/temperature");
+        const humStream = new EventSource("/streams/humidity");
+
+        let temperature;
+        let humidity;
+
+        getTemperatureText = (unit) => {
+            switch (unit) {
+                case "celsius":
+                    return temperature + " °C";
+                case "fahrenheit":
+                    return toFahrenheit(temperature).toFixed(2) + " °F";
+                default:
+                    return temperature + " °C";
+            }
+        };
+
+        toFahrenheit = (celsius) => (celsius * 9) / 5 + 32;
+
+        setTemperature = (temp) => {
+            const temperatureElement = document.getElementById("temperature");
+            const unit = document.querySelector(
+                'input[name="unit"]:checked'
+            ).value;
+            temperatureElement.textContent = getTemperatureText(unit);
+        };
+
+        setHumidity = (hum) => {
+            const humidityElement = document.getElementById("humidity");
+            humidityElement.textContent = `${hum.toFixed(2)} %`;
+        };
+
+        tempStream.onmessage = (event) => {
+            temperature = parseFloat(event.data);
+            setTemperature();
+        };
+
+        humStream.onmessage = (event) => {
+            humidity = parseFloat(event.data);
+            setHumidity(humidity);
+        };
+    </script>
+</html>
