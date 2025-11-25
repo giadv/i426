@@ -8,6 +8,10 @@
             rel="stylesheet"
             href="{{ url_for('static', filename='style.css') }}"
         />
+        <script
+            src="{{ url_for('static', filename='script.js') }}"
+            defer
+        ></script>
     </head>
     <body>
         <header>
@@ -49,119 +53,4 @@
             </div>
         </main>
     </body>
-
-    <script>
-        const tempStream = new EventSource("/streams/temperature");
-        const humStream = new EventSource("/streams/humidity");
-
-        const header = document.querySelector("header");
-        const boxes = document.querySelectorAll(".data-box");
-        const temperatureElement = document.getElementById("temperature");
-        const humidityElement = document.getElementById("humidity");
-
-        // red, orange, blue
-        const hotColors = {
-            boxes: "rgba(255, 79, 71, 0.762)",
-            unit: "rgba(255, 69, 0, 0.7)",
-            header: "rgba(255, 79, 71, 0.498)",
-        };
-        const warmColors = {
-            boxes: "rgba(255, 165, 0, 0.762)",
-            unit: "rgba(255, 160, 0, 0.8)",
-            header: "rgba(255, 165, 0, 0.498)",
-        };
-        const coolColors = {
-            boxes: "rgba(110, 188, 248, 0.762)",
-            unit: "rgb(110, 180, 233)",
-            header: "rgba(110, 188, 248, 0.498)",
-        };
-
-        let temperature = 0;
-        let humidity = 0;
-
-        const selectedUnit = () =>
-            document.querySelector('input[name="unit"]:checked').value;
-
-        const getTemperatureText = (unit) => {
-            switch (unit) {
-                case "celsius":
-                    return temperature + " °C";
-                case "fahrenheit":
-                    return toFahrenheit(temperature).toFixed(2) + " °F";
-                default:
-                    return temperature + " °C";
-            }
-        };
-
-        const toFahrenheit = (celsius) => (celsius * 9) / 5 + 32;
-
-        const handleUnitChange = () => {
-            updateTemperatureText();
-            updateColor();
-        };
-
-        const updateTemperatureText = () => {
-            const unit = document.querySelector(
-                'input[name="unit"]:checked'
-            ).value;
-            temperatureElement.textContent = getTemperatureText(unit);
-        };
-
-        const setTemperature = (temp) => {
-            if (temp !== undefined) {
-                temperature = temp;
-            }
-
-            updateTemperatureText();
-            updateColor();
-        };
-
-        const setHumidity = (hum) => {
-            humidityElement.textContent = `${hum.toFixed(2)} %`;
-        };
-
-        const setColor = (headerColor, unitColor, boxesColor) => {
-            header.style.borderBottomColor = headerColor;
-            boxes.forEach((box) => {
-                box.style.borderColor = boxesColor;
-            });
-            updateUnitColors(unitColor);
-        };
-
-        const updateUnitColors = (color) => {
-            const unit = selectedUnit();
-            const selectedLabel = document.querySelector(
-                `input[value="${unit}"] + label`
-            );
-            const unselectedLabel = document.querySelector(
-                `input[value="${
-                    unit === "celsius" ? "fahrenheit" : "celsius"
-                }"] + label`
-            );
-
-            selectedLabel.style.color = color;
-            unselectedLabel.style.color = "rgb(208, 208, 208)";
-        };
-
-        const updateColor = () => {
-            if (temperature >= 30) {
-                setColor(hotColors.header, hotColors.unit, hotColors.boxes);
-            } else if (temperature >= 20) {
-                setColor(warmColors.header, warmColors.unit, warmColors.boxes);
-            } else {
-                setColor(coolColors.header, coolColors.unit, coolColors.boxes);
-            }
-        };
-
-        tempStream.onmessage = (event) => {
-            temperature = parseFloat(event.data);
-            setTemperature(temperature);
-            updateColor();
-        };
-
-        humStream.onmessage = (event) => {
-            humidity = parseFloat(event.data);
-            setHumidity(humidity);
-        };
-    </script>
 </html>
