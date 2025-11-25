@@ -9,6 +9,11 @@ def home():
     return render_template("index.html")
 
 
+@app.route("/game")
+def game():
+    return render_template("game.html")
+
+
 @app.route("/streams/temperature")
 def stream_temperature():
     return Response(temperature_c(), mimetype="text/event-stream")
