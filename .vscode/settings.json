@@ -2,5 +2,8 @@
     "python.analysis.typeCheckingMode": "strict",
     "python.analysis.diagnosticSeverityOverrides": {
         "reportMissingTypeStubs": "none"
-    }
+    },
+    "files.exclude": {
+        "**/__pycache__": true,
+    },
 }
